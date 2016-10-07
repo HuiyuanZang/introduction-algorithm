@@ -10,7 +10,7 @@ DEBUG=-g
 _DEPS=sort.h
 DEPS=$(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ=test.o insert_sort.o selection_sort.o merge_sort.o
+_OBJ=test.o insert_sort.o selection_sort.o merge_sort.o merge_sort2_3-2.o
 OBJ=$(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)

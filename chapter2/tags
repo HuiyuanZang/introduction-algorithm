@@ -15,23 +15,33 @@ LIBS	makefile	/^LIBS=-lm$/;"	m
 OBJ	makefile	/^OBJ=$(patsubst %,$(ODIR)\/%,$(_OBJ))$/;"	m
 ODIR	makefile	/^ODIR=obj$/;"	m
 _DEPS	makefile	/^_DEPS=sort.h$/;"	m
-_OBJ	makefile	/^_OBJ=test.o insert_sort.o selection_sort.o merge_sort.o$/;"	m
+_OBJ	makefile	/^_OBJ=test.o insert_sort.o selection_sort.o merge_sort.o merge_sort2_3-2.o$/;"	m
 __SORT_H__	sort.h	2;"	d
-__merge_sort	merge_sort.c	/^static void  __merge_sort(int *array, unsigned start, unsigned end)$/;"	f	file:
-action	test.c	/^	action_f action;$/;"	m	struct:__anon1	file:
+__anon1::action	test.c	/^	action_f action;$/;"	m	struct:__anon1	file:	access:public
+__anon1::alise	test.c	/^	char* alise;$/;"	m	struct:__anon1	file:	access:public
+__anon1::name	test.c	/^	char* name;$/;"	m	struct:__anon1	file:	access:public
+__merge_sort	merge_sort.c	/^static void  __merge_sort(int *array, unsigned start, unsigned end)$/;"	f	file:	signature:(int *array, unsigned start, unsigned end)
+action	test.c	/^	action_f action;$/;"	m	struct:__anon1	file:	access:public
 action_f	test.c	/^typedef void (*action_f)(int*,unsigned);$/;"	t	file:
-alise	test.c	/^	char* alise;$/;"	m	struct:__anon1	file:
+alise	test.c	/^	char* alise;$/;"	m	struct:__anon1	file:	access:public
 cmd_table	test.c	/^static cmd_table_t cmd_table[]={$/;"	v	file:
 cmd_table_t	test.c	/^}cmd_table_t;$/;"	t	typeref:struct:__anon1	file:
-do_function	test.c	/^static void do_function(action_f cmd, int *array, unsigned size)$/;"	f	file:
-err_exit	test.c	/^static void err_exit(char* name)$/;"	f	file:
-insert_sort	insert_sort.c	/^void insert_sort(int * array, unsigned int size)$/;"	f
-insert_sort2	insert_sort.c	/^void insert_sort2(int *array, unsigned int size)$/;"	f
-main	test.c	/^void main (int argc, char* argv[])$/;"	f
+do_function	test.c	/^static void do_function(action_f cmd, int *array, unsigned size)$/;"	f	file:	signature:(action_f cmd, int *array, unsigned size)
+err_exit	test.c	/^static void err_exit(char* name)$/;"	f	file:	signature:(char* name)
+insert_sort	insert_sort.c	/^void insert_sort(int * array, unsigned int size)$/;"	f	signature:(int * array, unsigned int size)
+insert_sort	sort.h	/^void insert_sort(int *array, unsigned int size);$/;"	p	signature:(int *array, unsigned int size)
+insert_sort2	insert_sort.c	/^void insert_sort2(int *array, unsigned int size)$/;"	f	signature:(int *array, unsigned int size)
+insert_sort2	sort.h	/^void insert_sort2(int *array, unsigned int size);$/;"	p	signature:(int *array, unsigned int size)
+main	test.c	/^void main (int argc, char* argv[])$/;"	f	signature:(int argc, char* argv[])
 max	merge_sort.c	3;"	d	file:
-merge1	merge_sort.c	/^static bool merge1(int *array, unsigned q, unsigned p, unsigned r )$/;"	f	file:
-merge_sort	merge_sort.c	/^void merge_sort(int *array, unsigned int size)$/;"	f
-name	test.c	/^	char* name;$/;"	m	struct:__anon1	file:
-pr_times	test.c	/^static void pr_times(clock_t real,struct tms *tmsstart, struct tms *tmsend) $/;"	f	file:
-random_number	test.c	/^static int random_number(int min, int max)$/;"	f	file:
-selection_sort	selection_sort.c	/^void selection_sort(int *array, unsigned int size)$/;"	f
+merge1	merge_sort.c	/^static bool merge1(int *array, unsigned q, unsigned p, unsigned r )$/;"	f	file:	signature:(int *array, unsigned q, unsigned p, unsigned r )
+merge_sort	merge_sort.c	/^void merge_sort(int *array, unsigned int size)$/;"	f	signature:(int *array, unsigned int size)
+merge_sort	sort.h	/^void merge_sort(int *array, unsigned int size);$/;"	p	signature:(int *array, unsigned int size)
+merge_sort_without_sentinels	merge_sort2_3-2.c	/^static void merge_sort_without_sentinels(int * arrary, int star, int size)$/;"	f	file:	signature:(int * arrary, int star, int size)
+merge_sort_without_sentinels	sort.h	/^void merge_sort_without_sentinels(int *array, unsigned int size);$/;"	p	signature:(int *array, unsigned int size)
+merge_without_sentinels	merge_sort2_3-2.c	/^static bool merge_without_sentinels(int *array, unsigned q, unsigned p, unsigned r)$/;"	f	file:	signature:(int *array, unsigned q, unsigned p, unsigned r)
+name	test.c	/^	char* name;$/;"	m	struct:__anon1	file:	access:public
+pr_times	test.c	/^static void pr_times(clock_t real,struct tms *tmsstart, struct tms *tmsend) $/;"	f	file:	signature:(clock_t real,struct tms *tmsstart, struct tms *tmsend)
+random_number	test.c	/^static int random_number(int min, int max)$/;"	f	file:	signature:(int min, int max)
+selection_sort	selection_sort.c	/^void selection_sort(int *array, unsigned int size)$/;"	f	signature:(int *array, unsigned int size)
+selection_sort	sort.h	/^void selection_sort(int *array, unsigned int size);$/;"	p	signature:(int *array, unsigned int size)

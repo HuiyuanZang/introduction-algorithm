@@ -58,7 +58,8 @@ static cmd_table_t cmd_table[]={
 	{"insert","i", insert_sort},
 	{"insert2","i2",insert_sort2},
 	{"selection","s",selection_sort},
-	{"merge","m",merge_sort}
+	{"merge","m",merge_sort},
+        {"merge2","m2",merge_sort_without_sentinels}
 };
 
 
