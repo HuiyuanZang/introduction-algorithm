@@ -58,9 +58,12 @@ typedef unsigned char u8;
  */
 
 //It is allowed to arrayOut=arrayIn
-static void insert_sort(int *arrayIn, int *arrayOut,int size, compare_op cmp );
-static void select_sort(int *arrayIn, int *arrayOut,int size, compare_op cmp );
-static void  add_barray(const u8 *a, const u8 *b,size_t inSize, u8 *outcome,size_t outSize);
+static void insert_sort(const int *arrayIn, int *arrayOut,size_t  size, compare_op cmp );
+static void select_sort(const int *arrayIn, int *arrayOut,size_t size, compare_op cmp );
+static void __merge(int *array,int p, size_t size,compare_op cmp);
+static void __merge_sort(int *array, size_t size, compare_op cmp);
+static void merge_sort(const int *arrayIn, int *arrayOut, size_t size, compare_op cmp);
+static void add_barray(const u8 *a, const u8 *b,size_t inSize, u8 *outcome,size_t outSize);
 static void array_log(int *array, int size);
 static void barray_log (u8 *array, size_t size);
 static int default_cmp(int a, int b);
@@ -69,12 +72,12 @@ static int default_cmp(int a, int b);
  */
 
 
-static void insert_sort(int *arrayIn, int *arrayOut,int size, compare_op cmp )
+static void insert_sort(const int *arrayIn, int *arrayOut,size_t size, compare_op cmp )
 {
     int i, j, cur;
     if (!arrayIn || !arrayOut || size == 0 || !cmp)
     {
-        LOG("Wrong arugument arrayIn=%p arrayOut=%p size=%d cmp=%p", arrayIn,arrayOut,size,cmp);
+        LOG("Wrong arugument arrayIn=%p arrayOut=%p size=%zd cmp=%p", arrayIn,arrayOut,size,cmp);
         return;
     }
     arrayOut[0] = arrayIn[0];
@@ -89,27 +92,86 @@ static void insert_sort(int *arrayIn, int *arrayOut,int size, compare_op cmp )
     }
 }
 
-static void select_sort(int *arrayIn, int *arrayOut,int size, compare_op cmp )
+static void select_sort(const int *arrayIn, int *arrayOut,size_t size, compare_op cmp )
 {
     int i,j;
 	int min, minIndex;
+    memcpy(arrayOut,arrayIn, sizeof(int)*size);
     for(i=0;i<size-1;i++)
 	{
-	    min = arrayIn[i];
+	    min = arrayOut[i];
 		minIndex = i;
 	    for(j=i+1;j<size;j++)
 		{
-		    if(arrayIn[j] < min)
+		    if( cmp(arrayOut[j], min)<0 )
 			{
-			    min = arrayIn[j];
+			    min = arrayOut[j];
 				minIndex = j;
 			}
 		}
-		arrayIn[minIndex] = arrayIn[i];
-		arrayIn[i] = min;
-		arrayOut[i] = arrayIn[i];
+		arrayOut[minIndex] = arrayOut[i];
+		arrayOut[i] = min;
 	}
-	arrayOut[size-1] = arrayIn[size-1];
+}
+
+//To merge sorted array[0-p](p+1)  and sorted array[p+1--size-1] (size-p-1)
+//then become sorted array'[0--size-1]
+static void __merge(int *array,int p, size_t size,compare_op cmp)
+{
+    int i, j;
+    if ( !array )
+    {
+        fprintf(stderr, "argument is NULL");
+        return;
+    }
+    if ( p > size-1  )
+    {
+        fprintf(stderr, "th");
+        return;
+    }
+    if (p == 0)
+    {
+        //LOG("array had been sorted since p is %d\n",p);
+        //return;
+    }
+
+    for (i = p+1; i < size; i++)
+    {
+        int cur = array[i];
+        for (j = i-1; j >= 0; j--)
+        {   
+            if (cmp(array[j],cur)<0)
+                array[j+1] = array[j];
+        }
+        array[j+1] = cur;
+    }
+
+}
+
+static void __merge_sort(int *array, size_t size, compare_op cmp)
+{
+    if (!array)
+    {
+        fprintf(stderr,"array is NULL\n");
+        return;
+    }
+    if (size == 0)
+    {
+        fprintf(stderr, "Empty array\n");
+        return;
+    }
+    //the recur
+    if (size == 1)
+        return;
+    __merge_sort(array,(size)>>1,cmp);
+    __merge_sort(&array[(size>>1) + 1],size-(size>>1), cmp);
+    __merge(array,(size>>1)-1,size,cmp);
+}
+
+static void merge_sort(const int *arrayIn, int *arrayOut, size_t size, compare_op cmp)
+{
+    memcpy(arrayOut,arrayIn,sizeof(int)*size);
+    __merge_sort(arrayOut,size,cmp);
 }
 static void add_barray(const u8 *a, const u8 *b,size_t inSize, u8 *outcome,size_t outSize)
 {
@@ -126,12 +188,16 @@ static void add_barray(const u8 *a, const u8 *b,size_t inSize, u8 *outcome,size_
     for (i=0; i< inSize; i++)
     {
         outcome[i]= (a[i]&BINARY_MASK)^(b[i]&BINARY_MASK)^(carry&BINARY_MASK);
+        // Or set carry based on checking if (a[i] + b[i] + carry) >= 2
+        carry =((a[i]&BINARY_MASK) +(b[i]&BINARY_MASK) + carry) > 1?0x01:0x00;
+    #if 0
         if ( !outcome[i] && (!(a[i]&BINARY_MASK)||!(b[i]&BINARY_MASK)||!(carry&BINARY_MASK)))
             carry = 0x01;
 	    else if (outcome[i]&BINARY_MASK && a[i]&BINARY_MASK && b[i]&BINARY_MASK && carry&BINARY_MASK )
 	        carry = 0x01;
 		else
 		    carry = 0x00;
+    #endif 
     }
     outcome[inSize] = carry;
 }
@@ -254,6 +320,15 @@ int main (int argc, char *argv[])
             array_log(arrayIn,arraySize);
             select_sort(arrayIn,arrayOut,arraySize,default_cmp);
 	        array_log(arrayOut,arraySize);
+			memset(arrayOut,0x00,arraySize);
+
+			//merge_sort 
+	        LOG("merge_sort\n");
+            array_log(arrayIn,arraySize);
+            merge_sort(arrayIn,arrayOut,arraySize,default_cmp);
+	        array_log(arrayOut,arraySize);
+
+
 			if(arrayIn)
 			    free(arrayIn);
 			if(arrayOut)

@@ -6,20 +6,22 @@ LDIR=
 ODIR=obj
 LIBS=-lm
 DEBUG=-g
+MACRO=__DEBUG__
 
-_DEPS=sort.h
+
+_DEPS=
 DEPS=$(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ=test.o insert_sort.o selection_sort.o merge_sort.o merge_sort2_3-2.o
+_OBJ=chapter2.o
 OBJ=$(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)
-	$(CC) $(DEBUG) -c -o $@ $< $(CFLAGS)
+	$(CC) $(DEBUG) -D$(MACRO) -c -o $@ $< $(CFLAGS)
 
-test_sort:$(OBJ)
+test_chapter2:$(OBJ)
 	$(CC) $(DEBUG) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY:clean
 
 clean:
-	rm -f test_sort $(ODIR)/*.o *~ core $(INCDIR)/*~
+	rm -f test_chapter2 $(ODIR)/*.o *~ core $(INCDIR)/*~
