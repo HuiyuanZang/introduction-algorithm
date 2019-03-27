@@ -103,7 +103,7 @@ static void select_sort(const int *arrayIn, int *arrayOut,size_t size, compare_o
 		minIndex = i;
 	    for(j=i+1;j<size;j++)
 		{
-		    if( cmp(arrayOut[j], min)<0 )
+		    if( cmp(arrayOut[j], min)>0 )
 			{
 			    min = arrayOut[j];
 				minIndex = j;
@@ -129,19 +129,13 @@ static void __merge(int *array,int p, size_t size,compare_op cmp)
         fprintf(stderr, "th");
         return;
     }
-    if (p == 0)
-    {
-        //LOG("array had been sorted since p is %d\n",p);
-        //return;
-    }
 
     for (i = p+1; i < size; i++)
     {
         int cur = array[i];
-        for (j = i-1; j >= 0; j--)
+        for (j = i-1; j >= 0&&cmp(array[j],cur)<0; j--)
         {   
-            if (cmp(array[j],cur)<0)
-                array[j+1] = array[j];
+            array[j+1] = array[j];
         }
         array[j+1] = cur;
     }
@@ -153,7 +147,7 @@ static void __merge_sort(int *array, size_t size, compare_op cmp)
     if (!array)
     {
         fprintf(stderr,"array is NULL\n");
-        return;
+    }
     }
     if (size == 0)
     {
@@ -164,7 +158,7 @@ static void __merge_sort(int *array, size_t size, compare_op cmp)
     if (size == 1)
         return;
     __merge_sort(array,(size)>>1,cmp);
-    __merge_sort(&array[(size>>1) + 1],size-(size>>1), cmp);
+    __merge_sort(&array[(size>>1)],size-(size>>1), cmp);
     __merge(array,(size>>1)-1,size,cmp);
 }
 
