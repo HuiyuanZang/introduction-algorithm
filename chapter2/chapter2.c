@@ -59,6 +59,9 @@ typedef unsigned char u8;
 
 //It is allowed to arrayOut=arrayIn
 static void insert_sort(const int *arrayIn, int *arrayOut,size_t  size, compare_op cmp );
+static void __insert(int *array, size_t size, compare_op cmp);
+static void __recursive_insert_sort(int *array, size_t size, compare_op cmp);
+static void recursive_insert_sort(const int *arrayIn, int *arrayOut, size_t size, compare_op cmp);
 static void select_sort(const int *arrayIn, int *arrayOut,size_t size, compare_op cmp );
 static void __merge(int *array,int p, size_t size,compare_op cmp);
 static void __merge_sort(int *array, size_t size, compare_op cmp);
@@ -91,7 +94,34 @@ static void insert_sort(const int *arrayIn, int *arrayOut,size_t size, compare_o
         arrayOut[j+1] = cur;
     }
 }
-
+/*
+ * Assume: the items from 0 to size-2 were already sorted, then insert array[size-1] to the proper postion
+ * Note: The size of array must be greater than size
+ */
+static void __insert(int *array, size_t size, compare_op cmp)
+{
+    int i;
+    int value =  array[size-1];
+    for (i=size-2; i>= 0 && cmp(array[i],value) < 0; i--)
+    {
+       array[i+1] = array[i];
+    }
+    array[i+1] = value;
+}
+static void __recursive_insert_sort(int *array, size_t size, compare_op cmp)
+{
+    if (size == 1)
+    {
+        return;
+    }
+    __recursive_insert_sort(array,size-1, cmp);
+    __insert(array,size,cmp);
+}
+static void recursive_insert_sort(const int *arrayIn, int *arrayOut, size_t size, compare_op cmp)
+{
+    memcpy(arrayOut,arrayIn, sizeof(int)*size);
+    __recursive_insert_sort(arrayOut,size,cmp);
+}
 static void select_sort(const int *arrayIn, int *arrayOut,size_t size, compare_op cmp )
 {
     int i,j;
@@ -148,7 +178,6 @@ static void __merge_sort(int *array, size_t size, compare_op cmp)
     {
         fprintf(stderr,"array is NULL\n");
     }
-    }
     if (size == 0)
     {
         fprintf(stderr, "Empty array\n");
@@ -167,6 +196,88 @@ static void merge_sort(const int *arrayIn, int *arrayOut, size_t size, compare_o
     memcpy(arrayOut,arrayIn,sizeof(int)*size);
     __merge_sort(arrayOut,size,cmp);
 }
+
+
+//assume that the array was already sorted
+static int  binary_search(const int *array, size_t size,int value, compare_op cmp)
+{
+    int begin = 0;
+    int end = size-1;
+    int index = (begin + end)>>1; 
+    if (!array)
+    {
+        fprintf(stderr, "the pointer of array is NULL \n");
+        return -1;
+    }
+    if (size == 0)
+    {
+        fprintf(stderr,"the array is empty \n");
+        return -1;
+    }
+    if (size == 1)
+    {
+        if (cmp(array[0],value) == 0)
+            return 0;
+        else 
+            return -1;
+            
+    }
+    //
+    //when i = 0, begin = 0, end = size-1, if end - begin == 1 and array[index] != value  return -1;
+    //                                                          esle return index;
+    //
+    //when index = size>>1;
+    //when
+    //[0, size-1], set index = size>>1;
+    //[0, index -1 ] and  [index, size-1]
+    //if array[(size>>1)] < value, then
+   
+    while(begin != end)
+    {
+        if (cmp(array[index],value)<0)
+        {
+            end = index - 1;
+        }
+        else if (cmp(array[index],value)>0)
+        {
+            begin = index + 1;
+        }
+        else 
+            return index;
+        index =  (begine + end )>>1;
+    }
+    return -1;
+}
+//recursive version of binary search
+//assume that the array was already sorted
+static int  binary_search_r(const int *array, size_t size, compare_op cmp)
+{
+    int begin = 0;
+    int end = size-1;
+    int index = (begin + end)>>1; 
+    if (!array)
+    {
+        fprintf(stderr, "the pointer of array is NULL \n");
+        return -1;
+    }
+    if (size == 0)
+    {
+        fprintf(stderr,"the array is empty \n");
+        return -1;
+    }
+    if (size == 1)
+    {
+        if (cmp(array[0],value) == 0)
+            return 0;
+        else 
+            return -1;
+    }
+    if 
+    return binary_search_r
+}
+
+
+
 static void add_barray(const u8 *a, const u8 *b,size_t inSize, u8 *outcome,size_t outSize)
 {
     int i;
@@ -321,8 +432,12 @@ int main (int argc, char *argv[])
             array_log(arrayIn,arraySize);
             merge_sort(arrayIn,arrayOut,arraySize,default_cmp);
 	        array_log(arrayOut,arraySize);
+            
 
-
+	        LOG("recursive insert _sort\n");
+            array_log(arrayIn,arraySize);
+            recursive_insert_sort(arrayIn,arrayOut,arraySize,default_cmp);
+	        array_log(arrayOut,arraySize);
 			if(arrayIn)
 			    free(arrayIn);
 			if(arrayOut)
