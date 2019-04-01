@@ -244,36 +244,43 @@ static int  binary_search(const int *array, size_t size,int value, compare_op cm
         }
         else 
             return index;
-        index =  (begine + end )>>1;
+        index =  (begin + end )>>1;
     }
     return -1;
 }
 //recursive version of binary search
 //assume that the array was already sorted
-static int  binary_search_r(const int *array, size_t size, compare_op cmp)
+static int  binary_search_r(const int *array,int begin, int end,int value, compare_op cmp)
 {
-    int begin = 0;
-    int end = size-1;
-    int index = (begin + end)>>1; 
+    int index;
     if (!array)
     {
         fprintf(stderr, "the pointer of array is NULL \n");
         return -1;
     }
-    if (size == 0)
+    if (end - begin < 0)
     {
         fprintf(stderr,"the array is empty \n");
         return -1;
     }
-    if (size == 1)
+    if (end - begin  == 0)
     {
-        if (cmp(array[0],value) == 0)
-            return 0;
+        if (cmp(array[end],value) == 0)
+            return end;
         else 
             return -1;
     }
-    if 
-    return binary_search_r
+    index = (begin + end)>>1;
+	if (cmp(array[index], value)<0)
+	{
+	    return binary_search_r(array,begin,index-1,value,cmp);
+	}
+	else if(cmp(array[index],value)>0)
+	{
+	    return binary_search_r(array,index+1, end,value,cmp);
+	}
+	else
+        return index;
 }
 
 
@@ -341,17 +348,21 @@ int main (int argc, char *argv[])
     int optionIndex = 0;
     int *arrayIn = NULL;
     int arraySize = 0;
-    //INT_MAX = 2147483647, INT_MIN = -2147483648
+    int bValue = INT_MIN;
+	//INT_MAX = 2147483647, INT_MIN = -2147483648
     //10 bytes + 1 byte symbol char is enough for depicting integer from [INT_MIN,INT_MAX]
     char intValue[11]; 
-
-    while ((opt = getopt_long(argc,argv,"s:a",long_options, &optionIndex )) != -1)
+    
+    while ((opt = getopt_long(argc,argv,"s:ab:",long_options, &optionIndex )) != -1)
     {
         int newValueSize = 0;
         int arrayBufferSize = 64;
 		int *arrayOut = NULL;
         switch (opt)
         {
+		case 'b':
+		    bValue =  atoi(optarg);
+			break;
         case 's':
             printf("optarg[%zd]=%s \n",strlen(optarg),optarg);
             arrayIn = (int *)malloc(sizeof(int)*arrayBufferSize);
@@ -438,6 +449,17 @@ int main (int argc, char *argv[])
             array_log(arrayIn,arraySize);
             recursive_insert_sort(arrayIn,arrayOut,arraySize,default_cmp);
 	        array_log(arrayOut,arraySize);
+			if (bValue != INT_MIN)
+			{
+			    int ret;
+			    LOG("binary search value=%d \n",bValue);
+                ret = binary_search(arrayOut,arraySize,bValue,default_cmp);
+                LOG("the return value form bianry search is %d\n",ret);
+			    LOG("recursive binary search value=%d \n",bValue);
+                ret = binary_search_r(arrayOut,0,arraySize-1,bValue,default_cmp);
+                LOG("the return value form recursive bianry search is %d\n",ret);
+			}
+			
 			if(arrayIn)
 			    free(arrayIn);
 			if(arrayOut)
