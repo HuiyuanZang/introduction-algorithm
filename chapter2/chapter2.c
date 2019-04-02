@@ -40,6 +40,7 @@
 static struct option long_options[] = {
     {"sort",required_argument,0,'s' },
     {"add_barray",required_argument,0,'a' },
+    {"set_value", required_argument,0,'v'},
     {0,0,0,0}
 };
 
@@ -283,6 +284,61 @@ static int  binary_search_r(const int *array,int begin, int end,int value, compa
         return index;
 }
 
+static int find_sum(const int *array, size_t size, int sum,compare_op cmp)
+{
+    int i;
+    int *arrayOut;
+    if (!array)
+    {
+        fprintf(stderr, "array is NULL\n");
+        return -1;
+    }
+    if (size == 0)
+    {
+        fprintf(stderr,"empty array \n");
+        return -1;
+    }
+    arrayOut = (int*)malloc(sizeof(int)*size);
+    if(!arrayOut)
+    {
+        fprintf(stderr,"Cannot allocate memory for array\n");
+        return -1;
+    }
+    memcpy(arrayOut,array,sizeof(int)*size);
+    //O(nlnn)
+    merge_sort(array,arrayOut,size,cmp);
+    for (i=0;i<size;i++)
+    {
+        int index = binary_search(arrayOut,size,sum - arrayOut[i],cmp);
+        if (index == -1)
+        {
+            continue;
+        }
+        else
+        {
+            if ( index != i )
+            {
+                LOG("arrayOut[%d](%d) +arrayOut[%d](%d) = %d\n",index,arrayOut[index],i,arrayOut[i],sum );
+                return 1;
+            }
+            else
+            {
+                if ((i != size -1)&&(arrayOut[i+1] != arrayOut[i]) || 
+                    (i != 0) && (arrayOut[i-1] != arrayOut[i]))
+                {
+                    continue;
+                }
+                else
+                {
+                    LOG("%d +%d = %d\n",arrayOut[index],arrayOut[i],sum );
+                    return 1;
+                }
+            }
+        }
+    }
+    return -1;
+
+}
 
 
 static void add_barray(const u8 *a, const u8 *b,size_t inSize, u8 *outcome,size_t outSize)
@@ -353,14 +409,14 @@ int main (int argc, char *argv[])
     //10 bytes + 1 byte symbol char is enough for depicting integer from [INT_MIN,INT_MAX]
     char intValue[11]; 
     
-    while ((opt = getopt_long(argc,argv,"s:ab:",long_options, &optionIndex )) != -1)
+    while ((opt = getopt_long(argc,argv,"s:av:",long_options, &optionIndex )) != -1)
     {
         int newValueSize = 0;
         int arrayBufferSize = 64;
 		int *arrayOut = NULL;
         switch (opt)
         {
-		case 'b':
+		case 'v':
 		    bValue =  atoi(optarg);
 			break;
         case 's':
@@ -458,8 +514,17 @@ int main (int argc, char *argv[])
 			    LOG("recursive binary search value=%d \n",bValue);
                 ret = binary_search_r(arrayOut,0,arraySize-1,bValue,default_cmp);
                 LOG("the return value form recursive bianry search is %d\n",ret);
+
+                
+			    LOG("Check if there exist the sum of two elements is=%d \n",bValue);
+                ret = find_sum(arrayIn,arraySize,bValue,default_cmp);
+                LOG("the return value from find_sum is %d\n",ret);
+
 			}
-			
+
+            
+
+
 			if(arrayIn)
 			    free(arrayIn);
 			if(arrayOut)
@@ -477,10 +542,10 @@ int main (int argc, char *argv[])
             }
             break;
         default:
-            printf("Usage: %s [-i \"90 78 -60 45 79 86 789\" ] \n",argv[0]);
+            printf("Usage: %s [-v value] [-s \"90 78 -60 45 79 86 789\" ] [-a] \n",argv[0]);
             break;
         case '?':
-            printf("Usage: %s [-i \"90 78 -60 45 79 86 789\" ] \n",argv[0]);
+            printf("Usage: %s [-v value] [-s \"90 78 -60 45 79 86 789\" ] [-a]\n",argv[0]);
             break;
         }
     }
